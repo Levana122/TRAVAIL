@@ -1,34 +1,33 @@
-import requests
 from bs4 import BeautifulSoup
-from bs4 import BeautifulSoup
-with open("index.html", "r") as file:
-   soup = BeautifulSoup(file.read(), 'html.parser')
+
+# Ouvre le fichier HTML avec encodage UTF-8 pour éviter les problèmes de caractères
+with open("index.html", "r", encoding="utf-8") as file:
+    soup = BeautifulSoup(file.read(), 'html.parser')
+
 # Extraction du titre de la page
 title = soup.title.string
 print("Titre de la page:", title)
 
 # Extraction du texte de la balise h1
 h1_text = soup.find("h1").string
-
 print("Texte de la balise h1:", h1_text)
 
 # Dictionnaire pour stocker les produits
 all_products = dict()
 
-# Extraction des noms et des prix des produits dans la liste
+# Extraction des noms et des prix des produits
 products = soup.find_all("li")
 for product in products:
     name = product.find("h2").string
     price_str = product.find("p", class_="price").string
-    # On sépare la chaine avec " " en liste de mots
     price_list = price_str.split(" ")
-    # On récupère le prix (= deuxième mot)
-    all_products[name] = {"prix": price_list[1]}
+    price = price_list[1]
 
-# Extraction des descriptions des produits dans la liste
-descriptions_list = []
-for product in products:
-    # La description eest le dernier élément de la liste des paragraphes
+    # Nettoyage du prix (enlève caractères spéciaux, remplace la virgule)
+    price = price.replace('€', '').replace('â‚¬', '').replace(',', '.').strip()
+    all_products[name] = {"prix": price}
+
+    # Description
     description = product.find_all("p")[-1].string
     all_products[name]["description"] = description
 
@@ -38,12 +37,10 @@ print("Produits:", all_products)
 # Transformation des prix en dollars
 for name in all_products.keys():
     price_str = all_products[name]["prix"]
-    # Supprimer le symbole €
-    price = price_list[1].strip("€")
-    # Convertir en float
-    price = float(price)
+    price = float(price_str)
     dollar_price = price * 1.2
-    all_products[name]["prix_dollar"] = f"{dollar_price}$"
+    all_products[name]["prix_dollar"] = f"{dollar_price:.2f}$"
 
 # Affichage avec les prix en dollars
 print("Tous les produits:", all_products)
+
