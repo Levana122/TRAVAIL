@@ -11,6 +11,7 @@ print("Titre de la page:", title)
 
 # Extraction du texte de la balise h1
 h1_text = soup.find("h1").string
+
 print("Texte de la balise h1:", h1_text)
 
 # Dictionnaire pour stocker les produits
